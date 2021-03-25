@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pingouin game</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Press+Start+2P"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        height: 100vh;
+        font-family: "Press Start 2P", cursive; 
+        margin: 0;
+      }
+      body {
+        position: relative;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        flex-direction: column;
+
+        background-image: url('./data/fond.png');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+
+      p{
+        margin: 0;
+      }
+
+      .container{
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      canvas {
+        display: block;
+        background: #ccc;
+        box-shadow: inset 0 0 10px #000;
+      }
+
+      .interface{
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: column
+        ;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        color: black;
+
+        padding: 15px;
+        border: 15px solid black ;
+
+        font-size: 22px;
+      }
+
+
+
+      .buttonContainer{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .mainText{
+        width: 90%;
+        text-align: center;
+      }
+
+      .buttonPlay{
+        display: none;
+        cursor: pointer;
+        padding: 40px 30px 30px 45px;
+        border: 15px solid black ;
+        font-size: 80px;
+
+        transition: .3s ease-in-out;
+      }
+
+      .spriteContainer{
+        position: absolute;
+        top: 50px;
+        right: 50px;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: rgba(255, 255, 255, 0.438);
+        width: 100px;
+      }
+      .spriteContainer img{
+        width: 75px;
+        margin: 15px 15px;
+      }
+
+      .consignContainer{
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        }
+      .consignContainer p{
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.9);
+        color: black;
+        padding: 20px;
+        }
+
+      .crisp {
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: pixelated;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="allContainer">
+      <div class="consignContainer"><p>R = Retry</p><p>M = Editor</p></div>
+    <div class="container">
+      <canvas class="crisp"></canvas>
+      <div class="interface"> <div class="buttonContainer"><p class="buttonSkip">Skip</p><p class="buttonNext">Next</p></div><p class="buttonPlay">PLAY!</p><p class="mainText">Le but est de manger le poisson</p></div>
+    </div>
+    <div class="spriteContainer"><img class="sprite" data-spritenumber="1" src="./data/banquise.png" alt=""><img class="sprite"  data-spritenumber="2"  src="./data/rocher.png" alt=""><img class="sprite"  data-spritenumber="3"  src="./data/neige.png" alt=""><img class="sprite" data-spritenumber="5"  src="./data/pingouin.png" alt=""><img class="sprite" data-spritenumber="4"  src="./data/poisson.png" alt=""></div>
+    </div>
+    <script>
+
+
+      
+      
+
+      var Utils = {
+        rectangleCollision: function (r1, r2) {
+          let collision, dw, dh, overlapX, overlapY, vx, vy;
+
+          // Calcul distance entre les deux centres des rectangles
+          vx = r1.x + r1.width / 2 - (r2.x + r2.width / 2);
+          vy = r1.y + r1.height / 2 - (r2.y + r2.height / 2);
+
+          // Disatnce min avant collision
+          dw = r1.width / 2 + r2.width / 2;
+          dh = r1.height / 2 + r2.height / 2;
+
+          if (Math.abs(vx) < dw) {
+            if (Math.abs(vy) < dh) {
+              // Collision !
+              //On détermine de combien de pixels les éléments s'interpénètrent
+              // sur chaque axe
+              overlapX = dw - Math.abs(vx);
+              overlapY = dh - Math.abs(vy);
+              if (overlapX >= overlapY) {
+                if (vy > 0) {
+                  collision = "top";
+                  //Place le rectangle hors de la collision
+                  r1.y = r1.y + overlapY;
+                  model.ping.moving = false;
+                } else {
+                  collision = "bottom";
+                  //Place le rectangle hors de la collision
+                  r1.y = r1.y - overlapY;
+                  model.ping.moving = false;
+                }
+              } else {
+                if (vx > 0) {
+                  collision = "left";
+                  //Place le rectangle hors de la collision
+                  r1.x = r1.x + overlapX;
+                  model.ping.moving = false;
+                } else {
+                  collision = "right";
+                  //Place le rectangle hors de la collision
+                  r1.x = r1.x - overlapX;
+                  model.ping.moving = false;
+                }
+              }
+            } else {
+              collision = "no collision";
+            }
+          } else {
+            collision = "no collision";
+          }
+          return collision;
+        },
+        neigeCollision: function (r1, r2) {
+          //revoir ici
+          if(Math.abs(((r1.x + r1.width) - (r2.x + r2.width)) <6) && 
+          Math.abs(r1.x - r2.x) <6 &&
+          Math.abs((r1.y + r1.height) - (r2.y + r2.height)) < 6 &&
+          Math.abs((r1.y - r2.y )< 6)){
+            model.ping.moving = false;
+            model.ping.vx = 0;
+            model.ping.vy = 0;
+            model.ping.x = r2.x
+            model.ping.y = r2.y
+          }
+        },
+      };
+
+      var Glace = {
+        size: undefined,
+        width: undefined,
+        height: undefined,
+
+        // Sprite
+        sSize: 64,
+        sX: 0,
+        sY: 0,
+
+        visible: true,
+        init: function (col, row, size) {
+          this.size = this.width = this.height = size;
+          this.x = col * size;
+          this.y = row * size;
+        },
+      };
+
+      var Rocher = {
+        size: undefined,
+        width: undefined,
+        height: undefined,
+
+        // Sprite
+        sSize: 64,
+        sX: 0,
+        sY: 128,
+
+        visible: true,
+        init: function (col, row, size) {
+          this.size = this.width = this.height = size;
+          this.x = col * size;
+          this.y = row * size;
+        },
+      };
+
+      var Neige = {
+        size: undefined,
+        width: undefined,
+        height: undefined,
+
+        // Sprite
+        sSize: 64,
+        sX: 64,
+        sY: 128,
+
+        visible: true,
+        init: function (col, row, size) {
+          this.size = this.width = this.height = size;
+          this.x = col * size;
+          this.y = row * size;
+        },
+      };
+
+      var Poisson = {
+        size: undefined,
+        width: undefined,
+        height: undefined,
+
+        // Sprite
+        sSize: 64,
+        sX: 128,
+        sY: 128,
+
+        visible: true,
+        init: function (col, row, size) {
+          this.size = this.width = this.height = size;
+          this.x = col * size;
+          this.y = row * size;
+        },
+      };
+
+      var Pingouin = {
+        size: undefined,
+        width: undefined,
+        height: undefined,
+
+        //Sprite
+        sSize: 64,
+        sX: 0,
+        sY: 64,
+
+        visible: true,
+        moving: false,
+
+        x: undefined,
+        y: undefined,
+
+        vx: 0,
+        vy: 0,
+        speed: 10,
+
+        // Position
+        DOWN: 0,
+        UP: 1,
+        LEFT: 3,
+        RIGHT: 2,
+
+        direction: 0,
+        init: function (col, row, size) {
+          this.size = this.width = this.height = size;
+          this.x = col * size;
+          this.y = row * size;
+        },
+      };
+
+      var Bitcoin = {
+        size: undefined,
+        width: undefined,
+        height: undefined,
+
+        // Sprite
+        sSize: 64,
+        sX: 192,
+        sY: 128,
+
+        visible: true,
+        init: function (col, row, size) {
+          this.size = this.width = this.height = size;
+          this.x = col * size;
+          this.y = row * size;
+        },
+      };
+
+      var LevelMap = {
+        
+          level1: {
+            cols: 12,
+            rows: 12,
+            tSize: 64,
+            
+            layers: [
+            [
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              ],
+              [
+                  2,2,2,2,2,2,2,2,2,2,2,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,2,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,2,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,4,1,1,1,1,2,
+                  2,1,1,1,1,1,2,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,5,1,1,1,1,1,1,1,1,2,
+                  2,2,2,2,2,2,2,2,2,2,2,2,
+              ]
+            
+            ],
+            
+            getTile: function (layer, col, row) {
+          return this.layers[layer][row * this.cols + col];
+          },
+        },
+          level2: {
+            cols: 12,
+            rows: 12,
+            tSize: 64,
+
+            layers: [
+            [
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              ],
+              [
+                  2,2,2,2,2,2,2,2,2,2,2,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,2,2,
+                  2,1,1,2,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,2,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,2,1,1,1,1,1,2,
+                  2,2,1,1,1,1,1,1,2,1,1,2,
+                  2,1,1,2,4,1,2,1,1,1,1,2,
+                  2,1,1,1,2,5,1,1,1,2,1,2,
+                  2,2,2,2,2,2,2,2,2,2,2,2,
+              ]
+     
+              ],
+               getTile: function (layer, col, row) {
+          return this.layers[layer][row * this.cols + col];
+        },
+              },
+
+              level3:{
+                cols: 17,
+    rows: 17,
+    tSize: 64,
+
+    layers: [
+    [
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      ],
+      [
+        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+        2,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,2,
+        2,1,1,1,2,1,1,1,1,1,1,1,1,1,2,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,
+        2,1,1,1,3,1,1,1,1,1,1,1,1,2,2,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,3,1,1,1,2,
+        2,1,1,2,1,1,1,5,1,1,1,1,2,1,1,1,2,
+        2,1,1,1,1,1,1,1,1,1,3,1,1,2,1,1,2,
+        2,1,2,1,1,1,1,1,1,1,1,1,2,1,1,1,2,
+        2,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2,
+        2,2,1,1,1,1,1,4,1,1,1,1,1,1,1,3,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,2,
+        2,1,1,1,1,1,2,1,1,1,1,1,1,2,1,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,
+        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+      ]
+     
+    ],
+    getTile: function (layer, col, row) {
+          return this.layers[layer][row * this.cols + col];
+        },
+              },
+
+              level4: {
+    cols: 17,
+    rows: 17,
+    tSize: 64,
+
+    layers: [
+    [
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      ],
+      [
+        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+        2,1,1,2,1,1,1,1,1,1,2,1,1,1,1,1,2,
+        2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,2,
+        2,1,1,3,1,1,1,1,1,1,1,2,1,2,1,1,2,
+        2,1,1,1,1,1,1,1,2,1,1,1,4,1,1,1,2,
+        2,1,1,1,1,3,1,1,1,1,1,2,2,1,1,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,
+        2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,1,1,1,1,1,3,1,1,1,2,1,1,1,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,1,1,2,1,1,1,2,3,1,1,1,1,2,1,2,
+        2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,5,1,1,1,1,1,2,1,1,1,2,1,1,1,1,2,
+        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+      ]
+     
+    ],
+    getTile: function (layer, col, row) {
+          return this.layers[layer][row * this.cols + col];
+        },
+              },
+              level5: {
+    cols: 22,
+    rows: 22,
+    tSize: 64,
+
+    layers: [
+    [
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+      ],
+      [
+        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+        2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,1,1,2,
+        2,2,1,2,1,1,1,4,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,2,
+        2,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,
+        2,1,6,1,1,1,1,2,1,1,3,1,1,2,1,1,1,1,1,1,1,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,2,1,1,1,1,1,2,1,1,5,1,1,1,3,1,1,1,1,1,2,
+        2,1,2,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,2,1,1,1,1,1,2,1,1,1,2,1,1,2,1,1,1,2,2,2,
+        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,
+        2,3,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2,1,2,1,2,
+        2,1,1,1,1,1,1,1,1,1,3,1,2,1,3,1,1,1,2,1,1,2,
+        2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,2,
+        2,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,
+        2,1,1,1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,1,1,1,2,
+        2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,
+        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+
+      ]
+     
+    ],
+    getTile: function (layer, col, row) {
+          return this.layers[layer][row * this.cols + col];
+        },
+              },
+
+              levelEdit: {
+            cols: 12,
+            rows: 12,
+            tSize: 64,
+            
+            layers: [
+            [
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              1,1,1,1,1,1,1,1,1,1,1,1,
+              ],
+              [
+                  2,2,2,2,2,2,2,2,2,2,2,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,1,1,1,1,1,1,1,1,1,1,2,
+                  2,2,2,2,2,2,2,2,2,2,2,2,
+              ]
+            
+            ],
+            
+            getTile: function (layer, col, row) {
+          return this.layers[layer][row * this.cols + col];
+          },
+          setTile: function (ev) {
+          let row = Math.floor(ev.offsetX/this.tSize)
+          let col = Math.floor(ev.offsetY/this.tSize)
+          this.layers[1][row + this.cols * col] = model.currentSprite
+          model.buildMap()
+          },
+        },
+        
+      };
+
+      let menuData = [2,'Le but est de manger le poisson','Mais attention! ça glisse!','Vous pouvez vous arrêter sur la neige!','Récupérer la pièce pour gagner un compte Netflix! (sans tricher!)','Réussissez les niveaux le plus rapidement possible!']
+
+      var model = {
+        SIZE: null,
+        ROWS: null,
+        COLUMNS: null,
+        
+        lvl: 1,
+        map: LevelMap[`level${1}`],
+
+        currentSprite: 1,
+
+        GLACE: 1,
+        ROCHER: 2,
+        NEIGE: 3,
+        POISSON: 4,
+        PINGOUIN: 5,
+        BITCOIN: 6,
+
+        ping: undefined,
+        poiss: undefined,
+
+        sprites: [],
+        rochers: [],
+        neiges: [],
+
+        init: function () {
+          this.SIZE = model.map.tSize;
+          this.ROWS = model.map.rows;
+          this.COLUMNS = model.map.cols;
+        },
+
+        buildMap: function () {
+          this.sprites = [];
+          this.rochers = [];
+          this.neiges = [];
+          for (let i = 0; i < this.map.layers.length; i++) {
+            for (let row = 0; row < this.ROWS; row++) {
+              for (let col = 0; col < this.COLUMNS; col++) {
+                let currenTile = model.map.getTile(i, col, row);
+                switch (currenTile) {
+                  case this.GLACE:
+                    let tmpGlace = Object.create(Glace);
+                    tmpGlace.init(col, row, this.map.tSize);
+                    this.sprites.push(tmpGlace);
+                    break;
+                  case this.ROCHER:
+                    let tmpRocher = Object.create(Rocher);
+                    tmpRocher.init(col, row, this.map.tSize);
+                    this.sprites.push(tmpRocher);
+                    this.rochers.push(tmpRocher);
+                    break;
+                  case this.NEIGE:
+                    let tmpNeige = Object.create(Neige);
+                    tmpNeige.init(col, row, this.map.tSize);
+                    this.sprites.push(tmpNeige);
+                    this.neiges.push(tmpNeige);
+                    break;
+                  case this.POISSON:
+                    this.poiss = Object.create(Poisson);
+                    this.poiss.init(col, row, this.map.tSize);
+                    this.sprites.push(this.poiss);
+                    break;
+                  case this.PINGOUIN:
+                    this.ping = Object.create(Pingouin);
+                    this.ping.init(col, row, this.map.tSize);
+                    break;
+                  case this.BITCOIN:
+                    let tmpBitcoin = Object.create(Bitcoin);
+                    tmpBitcoin.init(col, row, this.map.tSize);
+                    this.sprites.push(tmpBitcoin);
+                    break;
+                }
+              }
+            }
+          }
+        },
+
+        update: function (key) {
+          if (key.right && !key.left && !key.top && !key.down && !this.ping.moving) {
+            this.ping.vy = 0;
+            this.ping.direction = this.ping.RIGHT;
+            this.ping.vx = this.ping.speed;
+            this.ping.moving = true;
+          }
+
+          if (!key.right && key.left && !key.top && !key.down && !this.ping.moving) {
+            this.ping.vy = 0;
+            this.ping.direction = this.ping.LEFT;
+            this.ping.vx = -this.ping.speed;
+            this.ping.moving = true;
+          }
+
+          if (key.up && !key.down && !this.ping.moving) {
+            this.ping.vx = 0;
+            this.ping.direction = this.ping.UP;
+            this.ping.vy = -this.ping.speed;
+            this.ping.moving = true;
+          }
+
+          if (!key.up && key.down && !this.ping.moving) {
+            this.ping.vx = 0;
+            this.ping.direction = this.ping.DOWN;
+            this.ping.vy = this.ping.speed;
+            this.ping.moving = true;
+          }
+
+          // ...
+          if (!this.ping.moving && this.ping.direction === this.ping.DOWN)
+            this.ping.sX = this.ping.sSize * 0;
+          if (!this.ping.moving && this.ping.direction === this.ping.UP)
+            this.ping.sX = this.ping.sSize * 1;
+          if (!this.ping.moving && this.ping.direction === this.ping.LEFT)
+            this.ping.sX = this.ping.sSize * 2;
+          if (!this.ping.moving && this.ping.direction === this.ping.RIGHT)
+            this.ping.sX = this.ping.sSize * 3;
+
+          if (this.ping.moving && this.ping.direction === this.ping.DOWN)
+            this.ping.sX = this.ping.sSize * 7;
+          if (this.ping.moving && this.ping.direction === this.ping.UP)
+            this.ping.sX = this.ping.sSize * 4;
+          if (this.ping.moving && this.ping.direction === this.ping.LEFT)
+            this.ping.sX = this.ping.sSize * 5;
+          if (this.ping.moving && this.ping.direction === this.ping.RIGHT)
+            this.ping.sX = this.ping.sSize * 6;
+
+          // Mise à jour de la position
+          this.ping.x += this.ping.vx;
+          this.ping.y += this.ping.vy;
+
+        },
+
+        hitRocher: function () {
+          this.rochers.forEach((rocher) => {
+            Utils.rectangleCollision(this.ping, rocher);
+          });
+        },
+
+        hitNeige: function(){
+          this.neiges.forEach((neige) => {
+             Utils.neigeCollision(this.ping, neige);
+          });
+          
+        },
+
+        hitPoisson: function () {
+            if(Utils.rectangleCollision(this.ping, this.poiss) !== "no collision"){
+              model.lvl++;
+              if(LevelMap[`level${model.lvl}`]){
+                model.map = LevelMap[`level${model.lvl}`]
+                model.init()
+                view.init(model.getWorldDim().width, model.getWorldDim().height);
+                model.buildMap()
+            }else{
+              console.log('vous avez fini le jeu')
+            }
+
+            }
+        },
+
+        getPingouin: function () {
+          return this.ping;
+        },
+
+        getSprites: function () {
+          return model.sprites;
+        },
+
+        getWorldDim: function () {
+          return {
+            width: this.COLUMNS * this.SIZE,
+            height: this.ROWS * this.SIZE,
+          };
+        },
+        skipMenu: function () {
+          menuData[0] = menuData.length
+          model.NextMenu()
+        },
+        NextMenu: function () {
+          if(menuData[0] < menuData.length){
+            view.textMenu.textContent = menuData[menuData[0]]
+            menuData[0]++
+          }else {
+            view.buttonPlay.style.display = 'block'
+            view.buttonSkip.style.display = 'none'
+            view.buttonNext.style.display = 'none'
+            view.textMenu.textContent = ""
+            }
+        },
+      };
+
+      var octopus = {
+        // ÉTATS DU JEU
+        LOAD: 0,
+        MENU: 1,
+        GAME: 2,
+        OVER: 3,
+        gameState: 0,
+
+        // États des touches
+        key: {
+          up: false,
+          down: false,
+          left: false,
+          right: false,
+        },
+
+        // Constantes et variables du requestanimation du jeu
+        previousDelta: null,
+        fpsLimit: 60,
+
+        init: function () {
+          model.init();
+          view.init(model.getWorldDim().width, model.getWorldDim().height);
+          view.loadSprite();
+          octopus.gameLoop();
+        },
+
+        gameLoop: function (currentDelta) {
+          // requestAnimationFrame : en moyenne 60 fois par 1000ms
+          // ce qui est un peu rapide pour nous...
+          window.requestAnimationFrame(octopus.gameLoop);
+
+          // Le paramètre currentDelta correspond au temps écoulé en ms
+          // depuis le lancement de requestAnimationFrame
+          // Nous pouvons calculer le laps de temps écoulé depuis notre dernière loop (tjs en ms)
+          let delta = currentDelta - octopus.previousDelta;
+
+          // return si celui-ci est inférieur au laps de temps de notre fps
+          if (octopus.fpsLimit && delta < 1000 / octopus.fpsLimit) {
+            return;
+          }
+
+          switch (octopus.gameState) {
+            case octopus.LOAD:
+              break;
+            case octopus.MENU:
+              model.buildMap();
+              view.bindEvents();
+              break;
+            case octopus.GAME:
+              model.update(octopus.key);
+              model.hitRocher();
+              model.hitPoisson()
+              model.hitNeige()
+              view.renderClear();
+              view.renderSprite(model.getSprites());
+              view.renderPing(model.getPingouin());
+
+              break;
+            case octopus.OVER:
+              break;
+          }
+
+          octopus.previousDelta = currentDelta;
+        },
+
+        handlerLoad: function () {
+          octopus.gameState = octopus.MENU;
+        },
+
+        handlerKeyDownUp: function (ev) {
+          let keyState = ev.type == "keydown" ? true : false;
+          switch (ev.keyCode) {
+            case 38: //UP
+              octopus.key.up = keyState;
+              break;
+            case 40: //DOWN
+              octopus.key.down = keyState;
+              break;
+            case 37: //LEFT
+              octopus.key.left = keyState;
+              break;
+            case 39: //RIGHT
+              octopus.key.right = keyState;
+              break;
+            case 82: //RESET
+              model.map = LevelMap[`level${model.lvl}`]
+              model.init()
+              view.init(model.getWorldDim().width, model.getWorldDim().height);
+              model.buildMap()
+              break;
+            case 77: //levelEdit
+            if(octopus.gameState !== octopus.MENU)
+            view.initEditLevel()
+              model.map = LevelMap[`levelEdit`]
+              model.init()
+              view.init(model.getWorldDim().width, model.getWorldDim().height);
+              model.buildMap()
+              break;
+          }
+        },
+      };
+
+      var view = {
+        canvas: null,
+        ctx: null,
+        image: null,
+        container: null,
+
+        menu: null,
+        textMenu: null,
+        buttonSkip: null,
+        buttonNext: null,
+        buttonPlay: null,
+
+        spriteContainer: null,
+        spritesLevel: null,
+
+        init: function (width, height) {
+          view.canvas = document.querySelector("canvas");
+          view.ctx = view.canvas.getContext("2d");
+          view.ctx.imageSmoothingEnabled = false;
+          view.canvas.width = width;
+          view.canvas.height = height;
+
+          view.container = document.querySelector('.container')
+          view.menu = document.querySelector('.interface')
+          view.textMenu = document.querySelector('.mainText')
+          view.buttonSkip = document.querySelector('.buttonSkip')
+          view.buttonNext = document.querySelector('.buttonNext')
+          view.buttonPlay = document.querySelector('.buttonPlay')
+
+          view.spriteContainer = document.querySelector('.spriteContainer')
+          view.spritesLevel = document.querySelectorAll('.sprite')
+
+          view.initMenu()
+      
+          view.resizeContainer()
+          
+        },
+        renderClear: function () {
+          view.ctx.clearRect(0, 0, view.canvas.width, view.canvas.height);
+        },
+
+        resizeContainer:function() {
+          let H = window.innerHeight
+          let W = window.innerWidth
+          let h = view.canvas.height
+          let w = view.canvas.width
+
+          let divH = H/h -0.1;
+          let divW = W/w -0.1;
+
+          if(divH < divW) view.container.style = `transform: scale(${divH})`;
+          else view.container.style = `transform: scale(${divW})`;
+        },
+
+        renderPing: function (ping) {
+          if (ping.visible) {
+            view.ctx.drawImage(
+              view.image,
+              ping.sX,
+              ping.sY,
+              ping.size,
+              ping.size,
+              ping.x,
+              ping.y,
+              ping.width,
+              ping.height
+            );
+          }
+        },
+
+        renderSprite: function (sprites) {
+          sprites.forEach((sprite) => {
+            if (sprite.visible) {
+              view.ctx.drawImage(
+                view.image,
+                sprite.sX,
+                sprite.sY,
+                sprite.size,
+                sprite.size,
+                sprite.x,
+                sprite.y,
+                sprite.width,
+                sprite.height
+              );
+            }
+          });
+        },
+
+        loadSprite: function () {
+          view.image = new Image();
+          view.image.addEventListener("load", octopus.handlerLoad, {
+            once: true,
+          });
+          view.image.src = "data/allSprite.png";
+        },
+        initMenu: function () {
+          view.buttonSkip.addEventListener("click", model.skipMenu)
+          view.buttonNext.addEventListener("click", model.NextMenu)
+          view.buttonPlay.addEventListener("click", () => {
+            octopus.gameState = octopus.GAME
+            view.menu.style.display = 'none'
+            })
+        },
+        initEditLevel: function () {
+          view.spriteContainer.style.display = 'flex';
+
+          view.spritesLevel.forEach((sprite) => {
+            sprite.addEventListener("click", () => {
+            model.currentSprite = Number(sprite.dataset.spritenumber);
+            console.log(model.currentSprite)
+          })})
+          view.canvas.addEventListener("click", (ev) => LevelMap.levelEdit.setTile(ev))
+        },
+
+        bindEvents: function () {
+          window.addEventListener("keydown", octopus.handlerKeyDownUp, false);
+          window.addEventListener("keyup", octopus.handlerKeyDownUp, false);
+        },
+      };
+
+      var Game = {
+        m: model,
+        o: octopus,
+        v: view,
+      };
+
+      Game.o.init();
+    </script>
+  </body>
+</html>
