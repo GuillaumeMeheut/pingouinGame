@@ -4,17 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pingouin game</title>
-    <link
-      href="https://fonts.googleapis.com/css?family=Press+Start+2P"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet" />
     <style>
       html,
       body {
         height: 100vh;
-        font-family: "Press Start 2P", cursive; 
+        font-family: "Press Start 2P", cursive;
         margin: 0;
       }
+
       body {
         position: relative;
 
@@ -23,50 +21,56 @@
         justify-content: space-around;
         flex-direction: column;
 
-        background-image: url('./data/fond.png');
+        background-image: url("./data/fond.png");
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
       }
 
-      p{
+      p {
         margin: 0;
       }
 
-      .container{
+      .container {
         position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
       }
+
       canvas {
         display: block;
         background: #ccc;
         box-shadow: inset 0 0 10px #000;
       }
 
-      .interface{
+      .interface {
         position: absolute;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        flex-direction: column
-        ;
+        flex-direction: column;
+
         width: 100%;
         height: 100%;
         background-color: white;
         color: black;
 
         padding: 15px;
-        border: 15px solid black ;
+        border: 15px solid black;
 
         font-size: 22px;
       }
 
+      .video {
+        position: absolute;
+        top: 12%;
+        left: 0;
+        width: 100%;
+      }
 
-
-      .buttonContainer{
+      .buttonContainer {
         display: flex;
         justify-content: space-between;
         width: 100%;
@@ -74,22 +78,22 @@
         cursor: pointer;
       }
 
-      .mainText{
+      .mainText {
         width: 90%;
         text-align: center;
       }
 
-      .buttonPlay{
+      .buttonPlay {
         display: none;
         cursor: pointer;
         padding: 40px 30px 30px 45px;
-        border: 15px solid black ;
+        border: 15px solid black;
         font-size: 80px;
 
-        transition: .3s ease-in-out;
+        transition: 0.3s ease-in-out;
       }
 
-      .spriteContainer{
+      .spriteContainer {
         position: absolute;
         top: 50px;
         right: 50px;
@@ -100,12 +104,13 @@
         background-color: rgba(255, 255, 255, 0.438);
         width: 100px;
       }
-      .spriteContainer img{
+
+      .spriteContainer img {
         width: 75px;
         margin: 15px 15px;
       }
 
-      .consignContainer{
+      .consignContainer {
         position: absolute;
         top: 50px;
         left: 50px;
@@ -113,36 +118,59 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        }
-      .consignContainer p{
+      }
+
+      .consignContainer p {
         width: 100%;
         background-color: rgba(255, 255, 255, 0.9);
         color: black;
         padding: 20px;
-        }
+      }
 
       .crisp {
         image-rendering: -moz-crisp-edges;
         image-rendering: -webkit-crisp-edges;
         image-rendering: pixelated;
+
       }
     </style>
   </head>
+
   <body>
     <div class="allContainer">
-      <div class="consignContainer"><p>R = Retry</p><p>M = Editor</p></div>
-    <div class="container">
-      <canvas class="crisp"></canvas>
-      <div class="interface"> <div class="buttonContainer"><p class="buttonSkip">Skip</p><p class="buttonNext">Next</p></div><p class="buttonPlay">PLAY!</p><p class="mainText">Le but est de manger le poisson</p></div>
-    </div>
-    <div class="spriteContainer"><img class="sprite" data-spritenumber="1" src="./data/banquise.png" alt=""><img class="sprite"  data-spritenumber="2"  src="./data/rocher.png" alt=""><img class="sprite"  data-spritenumber="3"  src="./data/neige.png" alt=""><img class="sprite" data-spritenumber="5"  src="./data/pingouin.png" alt=""><img class="sprite" data-spritenumber="4"  src="./data/poisson.png" alt=""></div>
+      <div class="consignContainer">
+        <p>R = Retry</p>
+        <p>M = Editor</p>
+      </div>
+      <div class="container">
+        <canvas class="crisp"></canvas>
+        <div class="interface">
+          <video class="video" autoplay muted loop>
+            <source src="./data/animMenu1.mp4" type="video/mp4" />
+          </video>
+          <div class="buttonContainer">
+            <p class="buttonSkip">Skip</p>
+            <p class="buttonNext">Next</p>
+          </div>
+          <p class="buttonPlay">PLAY!</p>
+          <p class="mainText">Le but est de manger le poisson</p>
+        </div>
+      </div>
+      <div class="spriteContainer">
+        <img class="sprite" data-spritenumber="1" src="./data/banquise.png" alt="" /><img
+          class="sprite"
+          data-spritenumber="2"
+          src="./data/rocher.png"
+          alt=""
+        /><img class="sprite" data-spritenumber="3" src="./data/neige.png" alt="" /><img
+          class="sprite"
+          data-spritenumber="5"
+          src="./data/pingouin.png"
+          alt=""
+        /><img class="sprite" data-spritenumber="4" src="./data/poisson.png" alt="" />
+      </div>
     </div>
     <script>
-
-
-      
-      
-
       var Utils = {
         rectangleCollision: function (r1, r2) {
           let collision, dw, dh, overlapX, overlapY, vx, vy;
@@ -197,15 +225,17 @@
         },
         neigeCollision: function (r1, r2) {
           //revoir ici
-          if(Math.abs(((r1.x + r1.width) - (r2.x + r2.width)) <6) && 
-          Math.abs(r1.x - r2.x) <6 &&
-          Math.abs((r1.y + r1.height) - (r2.y + r2.height)) < 6 &&
-          Math.abs((r1.y - r2.y )< 6)){
+          if (
+            Math.abs(r1.x + r1.width - (r2.x + r2.width) < 6) &&
+            Math.abs(r1.x - r2.x) < 6 &&
+            Math.abs(r1.y + r1.height - (r2.y + r2.height)) < 6 &&
+            Math.abs(r1.y - r2.y < 6)
+          ) {
             model.ping.moving = false;
             model.ping.vx = 0;
             model.ping.vy = 0;
-            model.ping.x = r2.x
-            model.ping.y = r2.y
+            model.ping.x = r2.x;
+            model.ping.y = r2.y;
           }
         },
       };
@@ -335,310 +365,319 @@
       };
 
       var LevelMap = {
-        
-          level1: {
-            cols: 12,
-            rows: 12,
-            tSize: 64,
-            
-            layers: [
+
+        level1: {
+          cols: 12,
+          rows: 12,
+          tSize: 64,
+
+          layers: [
             [
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              ],
-              [
-                  2,2,2,2,2,2,2,2,2,2,2,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,2,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,2,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,4,1,1,1,1,2,
-                  2,1,1,1,1,1,2,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,5,1,1,1,1,1,1,1,1,2,
-                  2,2,2,2,2,2,2,2,2,2,2,2,
-              ]
-            
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             ],
-            
-            getTile: function (layer, col, row) {
-          return this.layers[layer][row * this.cols + col];
+            [
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            ]
+
+          ],
+
+          getTile: function (layer, col, row) {
+            return this.layers[layer][row * this.cols + col];
           },
         },
-          level2: {
-            cols: 12,
-            rows: 12,
-            tSize: 64,
+        level2: {
+          cols: 12,
+          rows: 12,
+          tSize: 64,
 
-            layers: [
+          layers: [
             [
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              ],
-              [
-                  2,2,2,2,2,2,2,2,2,2,2,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,2,2,
-                  2,1,1,2,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,2,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,2,1,1,1,1,1,2,
-                  2,2,1,1,1,1,1,1,2,1,1,2,
-                  2,1,1,2,4,1,2,1,1,1,1,2,
-                  2,1,1,1,2,5,1,1,1,2,1,2,
-                  2,2,2,2,2,2,2,2,2,2,2,2,
-              ]
-     
-              ],
-               getTile: function (layer, col, row) {
-          return this.layers[layer][row * this.cols + col];
-        },
-              },
-
-              level3:{
-                cols: 17,
-    rows: 17,
-    tSize: 64,
-
-    layers: [
-    [
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      ],
-      [
-        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-        2,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,2,
-        2,1,1,1,2,1,1,1,1,1,1,1,1,1,2,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,
-        2,1,1,1,3,1,1,1,1,1,1,1,1,2,2,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,3,1,1,1,2,
-        2,1,1,2,1,1,1,5,1,1,1,1,2,1,1,1,2,
-        2,1,1,1,1,1,1,1,1,1,3,1,1,2,1,1,2,
-        2,1,2,1,1,1,1,1,1,1,1,1,2,1,1,1,2,
-        2,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2,
-        2,2,1,1,1,1,1,4,1,1,1,1,1,1,1,3,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,2,
-        2,1,1,1,1,1,2,1,1,1,1,1,1,2,1,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,
-        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-      ]
-     
-    ],
-    getTile: function (layer, col, row) {
-          return this.layers[layer][row * this.cols + col];
-        },
-              },
-
-              level4: {
-    cols: 17,
-    rows: 17,
-    tSize: 64,
-
-    layers: [
-    [
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      ],
-      [
-        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-        2,1,1,2,1,1,1,1,1,1,2,1,1,1,1,1,2,
-        2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,2,
-        2,1,1,3,1,1,1,1,1,1,1,2,1,2,1,1,2,
-        2,1,1,1,1,1,1,1,2,1,1,1,4,1,1,1,2,
-        2,1,1,1,1,3,1,1,1,1,1,2,2,1,1,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,
-        2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,1,1,1,1,1,3,1,1,1,2,1,1,1,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,1,1,2,1,1,1,2,3,1,1,1,1,2,1,2,
-        2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,5,1,1,1,1,1,2,1,1,1,2,1,1,1,1,2,
-        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-      ]
-     
-    ],
-    getTile: function (layer, col, row) {
-          return this.layers[layer][row * this.cols + col];
-        },
-              },
-              level5: {
-    cols: 22,
-    rows: 22,
-    tSize: 64,
-
-    layers: [
-    [
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-      ],
-      [
-        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-        2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,1,1,2,
-        2,2,1,2,1,1,1,4,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,2,
-        2,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,
-        2,1,6,1,1,1,1,2,1,1,3,1,1,2,1,1,1,1,1,1,1,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,2,1,1,1,1,1,2,1,1,5,1,1,1,3,1,1,1,1,1,2,
-        2,1,2,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,2,1,1,1,1,1,2,1,1,1,2,1,1,2,1,1,1,2,2,2,
-        2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,
-        2,3,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2,1,2,1,2,
-        2,1,1,1,1,1,1,1,1,1,3,1,2,1,3,1,1,1,2,1,1,2,
-        2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,2,
-        2,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,
-        2,1,1,1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,1,1,1,2,
-        2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,2,1,1,1,1,2,
-        2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-
-      ]
-     
-    ],
-    getTile: function (layer, col, row) {
-          return this.layers[layer][row * this.cols + col];
-        },
-              },
-
-              levelEdit: {
-            cols: 12,
-            rows: 12,
-            tSize: 64,
-            
-            layers: [
-            [
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              1,1,1,1,1,1,1,1,1,1,1,1,
-              ],
-              [
-                  2,2,2,2,2,2,2,2,2,2,2,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,1,1,1,1,1,1,1,1,1,1,2,
-                  2,2,2,2,2,2,2,2,2,2,2,2,
-              ]
-            
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             ],
-            
-            getTile: function (layer, col, row) {
-          return this.layers[layer][row * this.cols + col];
+            [
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2,
+              2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2,
+              2, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2,
+              2, 1, 1, 2, 4, 1, 2, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 2, 5, 1, 1, 1, 2, 1, 2,
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            ]
+
+          ],
+          getTile: function (layer, col, row) {
+            return this.layers[layer][row * this.cols + col];
+          },
+        },
+
+        level3: {
+          cols: 17,
+          rows: 17,
+          tSize: 64,
+
+          layers: [
+            [
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            ],
+            [
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2,
+              2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2,
+              2, 1, 1, 2, 1, 1, 1, 5, 1, 1, 1, 1, 2, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 2, 1, 1, 2,
+              2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 3, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2,
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            ]
+
+          ],
+          getTile: function (layer, col, row) {
+            return this.layers[layer][row * this.cols + col];
+          },
+        },
+
+        level4: {
+          cols: 17,
+          rows: 17,
+          tSize: 64,
+
+          layers: [
+            [
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            ],
+            [
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+              2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 4, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2,
+              2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 2, 1, 1, 1, 2, 3, 1, 1, 1, 1, 2, 1, 2,
+              2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 5, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2,
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            ]
+
+          ],
+          getTile: function (layer, col, row) {
+            return this.layers[layer][row * this.cols + col];
+          },
+        },
+        level5: {
+          cols: 22,
+          rows: 22,
+          tSize: 64,
+
+          layers: [
+            [
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            ],
+            [
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2,
+              2, 2, 1, 2, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2,
+              2, 1, 6, 1, 1, 1, 1, 2, 1, 1, 3, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 5, 1, 1, 1, 3, 1, 1, 1, 1, 1, 2,
+              2, 1, 2, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 2, 2, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2,
+              2, 3, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 2, 1, 3, 1, 1, 1, 2, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2,
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+
+            ]
+
+          ],
+          getTile: function (layer, col, row) {
+            return this.layers[layer][row * this.cols + col];
+          },
+        },
+
+        levelEdit: {
+          cols: 12,
+          rows: 12,
+          tSize: 64,
+
+          layers: [
+            [
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            ],
+            [
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+              2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            ]
+
+          ],
+
+          getTile: function (layer, col, row) {
+            return this.layers[layer][row * this.cols + col];
           },
           setTile: function (ev) {
-          let row = Math.floor(ev.offsetX/this.tSize)
-          let col = Math.floor(ev.offsetY/this.tSize)
-          this.layers[1][row + this.cols * col] = model.currentSprite
-          model.buildMap()
+            let row = Math.floor(ev.offsetX / this.tSize)
+            let col = Math.floor(ev.offsetY / this.tSize)
+            this.layers[1][row + this.cols * col] = model.currentSprite
+            model.buildMap()
           },
         },
-        
+
       };
 
-      let menuData = [2,'Le but est de manger le poisson','Mais attention! ça glisse!','Vous pouvez vous arrêter sur la neige!','Récupérer la pièce pour gagner un compte Netflix! (sans tricher!)','Réussissez les niveaux le plus rapidement possible!']
+      let menuData = [
+        2,
+        "Le but est de manger le poisson",
+        "Mais attention! ça glisse!",
+        "Vous pouvez vous arrêter sur la neige!",
+        "Ou contre les rochers.",
+        "Récupérer la pièce pour gagner un compte Netflix! (sans tricher!)",
+        "Réussissez les niveaux le plus rapidement possible!",
+      ];
+      let menuDataVideo = [1,"./data/animMenu2.mp4","./data/animMenu3.mp4","./data/animMenu4.mp4","./data/animMenu5.mp4","./data/animMenu6.mp4"];
 
       var model = {
         SIZE: null,
         ROWS: null,
         COLUMNS: null,
-        
+
         lvl: 1,
         map: LevelMap[`level${1}`],
 
@@ -761,7 +800,6 @@
           // Mise à jour de la position
           this.ping.x += this.ping.vx;
           this.ping.y += this.ping.vy;
-
         },
 
         hitRocher: function () {
@@ -770,26 +808,24 @@
           });
         },
 
-        hitNeige: function(){
+        hitNeige: function () {
           this.neiges.forEach((neige) => {
-             Utils.neigeCollision(this.ping, neige);
+            Utils.neigeCollision(this.ping, neige);
           });
-          
         },
 
         hitPoisson: function () {
-            if(Utils.rectangleCollision(this.ping, this.poiss) !== "no collision"){
-              model.lvl++;
-              if(LevelMap[`level${model.lvl}`]){
-                model.map = LevelMap[`level${model.lvl}`]
-                model.init()
-                view.init(model.getWorldDim().width, model.getWorldDim().height);
-                model.buildMap()
-            }else{
-              console.log('vous avez fini le jeu')
+          if (Utils.rectangleCollision(this.ping, this.poiss) !== "no collision") {
+            model.lvl++;
+            if (LevelMap[`level${model.lvl}`]) {
+              model.map = LevelMap[`level${model.lvl}`];
+              model.init();
+              view.init(model.getWorldDim().width, model.getWorldDim().height);
+              model.buildMap();
+            } else {
+              console.log("vous avez fini le jeu");
             }
-
-            }
+          }
         },
 
         getPingouin: function () {
@@ -807,19 +843,22 @@
           };
         },
         skipMenu: function () {
-          menuData[0] = menuData.length
-          model.NextMenu()
+          menuData[0] = menuData.length;
+          model.NextMenu();
         },
         NextMenu: function () {
-          if(menuData[0] < menuData.length){
-            view.textMenu.textContent = menuData[menuData[0]]
-            menuData[0]++
-          }else {
-            view.buttonPlay.style.display = 'block'
-            view.buttonSkip.style.display = 'none'
-            view.buttonNext.style.display = 'none'
-            view.textMenu.textContent = ""
-            }
+          if (menuData[0] < menuData.length) {
+            view.textMenu.textContent = menuData[menuData[0]];
+            view.video.src = menuDataVideo[menuDataVideo[0]];
+            menuData[0]++;
+            menuDataVideo[0]++;
+          } else {
+            view.buttonPlay.style.display = "block";
+            view.buttonSkip.style.display = "none";
+            view.buttonNext.style.display = "none";
+            view.textMenu.textContent = "";
+            view.video.style.display = "none";
+          }
         },
       };
 
@@ -875,8 +914,8 @@
             case octopus.GAME:
               model.update(octopus.key);
               model.hitRocher();
-              model.hitPoisson()
-              model.hitNeige()
+              model.hitPoisson();
+              model.hitNeige();
               view.renderClear();
               view.renderSprite(model.getSprites());
               view.renderPing(model.getPingouin());
@@ -909,18 +948,17 @@
               octopus.key.right = keyState;
               break;
             case 82: //RESET
-              model.map = LevelMap[`level${model.lvl}`]
-              model.init()
+              model.map = LevelMap[`level${model.lvl}`];
+              model.init();
               view.init(model.getWorldDim().width, model.getWorldDim().height);
-              model.buildMap()
+              model.buildMap();
               break;
             case 77: //levelEdit
-            if(octopus.gameState !== octopus.MENU)
-            view.initEditLevel()
-              model.map = LevelMap[`levelEdit`]
-              model.init()
+              if (octopus.gameState !== octopus.MENU) view.initEditLevel();
+              model.map = LevelMap[`levelEdit`];
+              model.init();
               view.init(model.getWorldDim().width, model.getWorldDim().height);
-              model.buildMap()
+              model.buildMap();
               break;
           }
         },
@@ -933,6 +971,7 @@
         container: null,
 
         menu: null,
+        video: null,
         textMenu: null,
         buttonSkip: null,
         buttonNext: null,
@@ -948,35 +987,35 @@
           view.canvas.width = width;
           view.canvas.height = height;
 
-          view.container = document.querySelector('.container')
-          view.menu = document.querySelector('.interface')
-          view.textMenu = document.querySelector('.mainText')
-          view.buttonSkip = document.querySelector('.buttonSkip')
-          view.buttonNext = document.querySelector('.buttonNext')
-          view.buttonPlay = document.querySelector('.buttonPlay')
+          view.container = document.querySelector(".container");
+          view.menu = document.querySelector(".interface");
+          view.video = document.querySelector(".video");
+          view.textMenu = document.querySelector(".mainText");
+          view.buttonSkip = document.querySelector(".buttonSkip");
+          view.buttonNext = document.querySelector(".buttonNext");
+          view.buttonPlay = document.querySelector(".buttonPlay");
 
-          view.spriteContainer = document.querySelector('.spriteContainer')
-          view.spritesLevel = document.querySelectorAll('.sprite')
+          view.spriteContainer = document.querySelector(".spriteContainer");
+          view.spritesLevel = document.querySelectorAll(".sprite");
 
-          view.initMenu()
-      
-          view.resizeContainer()
-          
+          view.initMenu();
+
+          view.resizeContainer();
         },
         renderClear: function () {
           view.ctx.clearRect(0, 0, view.canvas.width, view.canvas.height);
         },
 
-        resizeContainer:function() {
-          let H = window.innerHeight
-          let W = window.innerWidth
-          let h = view.canvas.height
-          let w = view.canvas.width
+        resizeContainer: function () {
+          let H = window.innerHeight;
+          let W = window.innerWidth;
+          let h = view.canvas.height;
+          let w = view.canvas.width;
 
-          let divH = H/h -0.1;
-          let divW = W/w -0.1;
+          let divH = H / h - 0.1;
+          let divW = W / w - 0.1;
 
-          if(divH < divW) view.container.style = `transform: scale(${divH})`;
+          if (divH < divW) view.container.style = `transform: scale(${divH})`;
           else view.container.style = `transform: scale(${divW})`;
         },
 
@@ -1022,22 +1061,23 @@
           view.image.src = "data/allSprite.png";
         },
         initMenu: function () {
-          view.buttonSkip.addEventListener("click", model.skipMenu)
-          view.buttonNext.addEventListener("click", model.NextMenu)
+          view.buttonSkip.addEventListener("click", model.skipMenu);
+          view.buttonNext.addEventListener("click", model.NextMenu);
           view.buttonPlay.addEventListener("click", () => {
-            octopus.gameState = octopus.GAME
-            view.menu.style.display = 'none'
-            })
+            octopus.gameState = octopus.GAME;
+            view.menu.style.display = "none";
+          });
         },
         initEditLevel: function () {
-          view.spriteContainer.style.display = 'flex';
+          view.spriteContainer.style.display = "flex";
 
           view.spritesLevel.forEach((sprite) => {
             sprite.addEventListener("click", () => {
-            model.currentSprite = Number(sprite.dataset.spritenumber);
-            console.log(model.currentSprite)
-          })})
-          view.canvas.addEventListener("click", (ev) => LevelMap.levelEdit.setTile(ev))
+              model.currentSprite = Number(sprite.dataset.spritenumber);
+              console.log(model.currentSprite);
+            });
+          });
+          view.canvas.addEventListener("click", (ev) => LevelMap.levelEdit.setTile(ev));
         },
 
         bindEvents: function () {
